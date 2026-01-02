@@ -20,9 +20,11 @@ class CouponProvider extends ChangeNotifier {
 
   Future<void> getCouponList(BuildContext context) async {
     ApiResponseModel apiResponse = await couponRepo!.getCouponList();
-    if (apiResponse.response != null && apiResponse.response!.statusCode == 200) {
+    if (apiResponse.response != null &&
+        apiResponse.response!.statusCode == 200) {
       _couponList = [];
-      apiResponse.response!.data.forEach((category) => _couponList!.add(CouponModel.fromJson(category)));
+      apiResponse.response!.data.forEach(
+          (category) => _couponList!.add(CouponModel.fromJson(category)));
       notifyListeners();
     } else {
       ApiCheckerHelper.checkApi(apiResponse);
@@ -33,17 +35,22 @@ class CouponProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     ApiResponseModel apiResponse = await couponRepo!.applyCoupon(coupon);
-    if (apiResponse.response != null && apiResponse.response!.statusCode == 200) {
+    if (apiResponse.response != null &&
+        apiResponse.response!.statusCode == 200) {
+      try {} catch (e) {}
       _coupon = CouponModel.fromJson(apiResponse.response!.data);
       if (_coupon!.minPurchase != null && _coupon!.minPurchase! <= order) {
-        if(_coupon!.discountType == 'percent') {
-          if(_coupon!.maxDiscount != null && _coupon!.maxDiscount != 0) {
-            _discount = (_coupon!.discount! * order / 100) < _coupon!.maxDiscount! ? (_coupon!.discount! * order / 100) : _coupon!.maxDiscount;
-          }else {
+        if (_coupon!.discountType == 'percent') {
+          if (_coupon!.maxDiscount != null && _coupon!.maxDiscount != 0) {
+            _discount =
+                (_coupon!.discount! * order / 100) < _coupon!.maxDiscount!
+                    ? (_coupon!.discount! * order / 100)
+                    : _coupon!.maxDiscount;
+          } else {
             _discount = _coupon!.discount! * order / 100;
           }
-        }else {
-          if(_coupon!.maxDiscount != null){
+        } else {
+          if (_coupon!.maxDiscount != null) {
             _discount = _coupon!.discount;
           }
           _discount = _coupon!.discount;
@@ -63,8 +70,15 @@ class CouponProvider extends ChangeNotifier {
     _coupon = null;
     _isLoading = false;
     _discount = 0.0;
-    if(notify) {
+    if (notify) {
       notifyListeners();
     }
   }
+}
+
+class Result {
+  final double value;
+  final String message;
+
+  Result(this.value, this.message);
 }

@@ -15,12 +15,15 @@ class CartCouponWidget extends StatelessWidget {
   final TextEditingController couponTextController;
   final double totalAmount;
   const CartCouponWidget({
-    Key? key, required this.couponTextController, required this.totalAmount,
+    Key? key,
+    required this.couponTextController,
+    required this.totalAmount,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final SplashProvider splashProvider = Provider.of<SplashProvider>(context, listen: false);
+    final SplashProvider splashProvider =
+        Provider.of<SplashProvider>(context, listen: false);
 
     return DottedBorder(
       dashPattern: const [5, 5],
@@ -31,64 +34,91 @@ class CartCouponWidget extends StatelessWidget {
       child: Consumer<CouponProvider>(
         builder: (context, coupon, child) {
           return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall),
+            padding: const EdgeInsets.symmetric(
+                horizontal: Dimensions.paddingSizeExtraSmall),
             child: Row(children: [
-
-              const CustomAssetImageWidget(Images.cartCouponIcon, width: 30, height: 30),
-
+              const CustomAssetImageWidget(Images.cartCouponIcon,
+                  width: 30, height: 30),
               Expanded(
                 child: TextField(
                   controller: couponTextController,
                   style: rubikRegular,
                   decoration: InputDecoration(
                     hintText: getTranslated('apply_coupon', context),
-                    hintStyle: rubikRegular.copyWith(color: Theme.of(context).hintColor),
+                    hintStyle: rubikRegular.copyWith(
+                        color: Theme.of(context).hintColor),
                     isDense: true,
                     filled: true,
                     enabled: coupon.discount == 0,
                     fillColor: Theme.of(context).cardColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.horizontal(
-                        left: Radius.circular(Provider.of<LocalizationProvider>(context, listen: false).isLtr ? 10 : 0),
-                        right: Radius.circular(Provider.of<LocalizationProvider>(context, listen: false).isLtr ? 0 : 10),
+                        left: Radius.circular(Provider.of<LocalizationProvider>(
+                                    context,
+                                    listen: false)
+                                .isLtr
+                            ? 10
+                            : 0),
+                        right: Radius.circular(
+                            Provider.of<LocalizationProvider>(context,
+                                        listen: false)
+                                    .isLtr
+                                ? 0
+                                : 10),
                       ),
                       borderSide: BorderSide.none,
                     ),
                   ),
                 ),
               ),
-
               InkWell(
                 onTap: () {
-                  if(couponTextController.text.isNotEmpty && !coupon.isLoading) {
-                    if(coupon.discount! < 1) {
-                      coupon.applyCoupon(couponTextController.text, totalAmount).then((discount) {
+                  if (couponTextController.text.isNotEmpty &&
+                      !coupon.isLoading) {
+                    if (coupon.discount! < 1) {
+                      coupon
+                          .applyCoupon(couponTextController.text, totalAmount)
+                          .then((discount) {
                         if (discount! > 0) {
-                          showCustomSnackBar('${getTranslated('you_got', context)}${splashProvider.configModel!.currencySymbol}$discount ${getTranslated('discount', context)}', context, isError: false);
-
+                          showCustomSnackBar(
+                              '${getTranslated('you_got', context)}${splashProvider.configModel!.currencySymbol}$discount ${getTranslated('discount', context)}',
+                              context,
+                              isError: false);
                         } else {
-                          showCustomSnackBar(getTranslated('invalid_code_or', context), context);
-
+                          showCustomSnackBar(
+                              getTranslated('invalid_code_or', context),
+                              context);
                         }
                       });
                     } else {
                       coupon.removeCouponData(true);
                     }
-                  } else if(couponTextController.text.isEmpty) {
-                    showCustomSnackBar(getTranslated('enter_a_Coupon_code', context), context);
+                  } else if (couponTextController.text.isEmpty) {
+                    showCustomSnackBar(
+                        getTranslated('enter_a_Coupon_code', context), context);
                   }
                 },
                 child: Container(
-                  height: 40, width: 100,
+                  height: 40,
+                  width: 100,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: Theme.of(context).primaryColor,
                     borderRadius: const BorderRadius.all(Radius.circular(50)),
                   ),
-                  child: coupon.discount! <= 0 ? !coupon.isLoading ? Text(
-                    getTranslated('apply', context),
-                    style: rubikMedium.copyWith(color: Colors.white),
-                  ) : const SizedBox(width: Dimensions.paddingSizeDefault, height: Dimensions.paddingSizeDefault,child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white))) : const Icon(Icons.clear, color: Colors.white),
+                  child: coupon.discount! <= 0
+                      ? !coupon.isLoading
+                          ? Text(
+                              getTranslated('apply', context),
+                              style: rubikMedium.copyWith(color: Colors.white),
+                            )
+                          : const SizedBox(
+                              width: Dimensions.paddingSizeDefault,
+                              height: Dimensions.paddingSizeDefault,
+                              child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white)))
+                      : const Icon(Icons.clear, color: Colors.white),
                 ),
               ),
             ]),
