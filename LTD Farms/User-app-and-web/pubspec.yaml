@@ -67,7 +67,7 @@ dependencies:
   stacked: ^3.0.1
   stacked_services: ^0.9.8
   page_transition: ^2.0.9
-  pusher_channels_flutter: ^2.4.0
+  # pusher_channels_flutter: ^2.4.0
   webview_flutter: ^4.4.2
 
 dependency_overrides:

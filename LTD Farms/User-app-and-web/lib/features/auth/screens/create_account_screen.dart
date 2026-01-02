@@ -43,6 +43,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   String? _countryDialCode;
+  String? _selectedCountryCode;
 
   final ScrollController _scrollController = ScrollController();
   double _scrollPosition = 0;
@@ -70,6 +71,10 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       setState(() {});
     });
 
+    _lastNameFocus.addListener(() {
+      setState(() {});
+    });
+
     _emailFocus.addListener(() {
       setState(() {});
     });
@@ -88,17 +93,51 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     authProvider.updateIsUpdateTernsStatus(value: false, isUpdate: false);
     registrationProvider.setErrorMessage = '';
 
-    _countryDialCode = CountryCode.fromCountryCode(
-            Provider.of<SplashProvider>(context, listen: false)
+    final String configCountryCode =
+        Provider.of<SplashProvider>(context, listen: false)
                 .configModel!
-                .countryCode!)
-        .dialCode;
+                .countryCode ??
+            'US';
+    print(
+        '----(CREATE ACCOUNT SCREEN)---- Config Country Code: $configCountryCode');
+
+    // Map country code to dial code
+    final Map<String, String> countryDialCodeMap = {
+      'US': '+1',
+      'CA': '+1',
+      'GB': '+44',
+      'AU': '+61',
+      'IN': '+91',
+      'AE': '+971',
+      'SA': '+966',
+    };
+
+    _selectedCountryCode = configCountryCode.toUpperCase();
+
+    try {
+      // Try to get from map first, then fall back to CountryCode parser
+      if (countryDialCodeMap.containsKey(_selectedCountryCode)) {
+        _countryDialCode = countryDialCodeMap[_selectedCountryCode];
+        print(
+            '----(CREATE ACCOUNT SCREEN)---- Using mapped dial code: $_countryDialCode');
+      } else {
+        _countryDialCode =
+            CountryCode.fromCountryCode(_selectedCountryCode ?? "").dialCode;
+        print(
+            '----(CREATE ACCOUNT SCREEN)---- Using parser dial code: $_countryDialCode');
+      }
+    } catch (e) {
+      print(
+          '----(CREATE ACCOUNT SCREEN)---- Error parsing country code: $e, using default US (+1)');
+      _countryDialCode = '+1';
+    }
   }
 
   @override
   void dispose() {
     super.dispose();
     _firstNameFocus.dispose();
+    _lastNameFocus.dispose();
     _numberFocus.dispose();
     _emailFocus.dispose();
     _passwordFocus.dispose();
@@ -209,7 +248,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       isShowBorder: true,
                       controller: _firstNameController,
                       focusNode: _firstNameFocus,
-                      nextFocus: _numberFocus,
+                      nextFocus: _lastNameFocus,
                       inputType: TextInputType.name,
                       capitalization: TextCapitalization.words,
                     ),
@@ -217,18 +256,18 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
                     // for last name section
 
-                    // CustomTextFieldWidget(
-                    //   hintText: getTranslated('last_name', context),
-                    //   prefixAssetUrl: Images.profile,
-                    //   isShowBorder: true,
-                    //   isShowPrefixIcon: true,
-                    //   controller: _lastNameController,
-                    //   focusNode: _lastNameFocus,
-                    //   nextFocus: _numberFocus,
-                    //   inputType: TextInputType.name,
-                    //   capitalization: TextCapitalization.words,
-                    // ),
-                    // const SizedBox(height: Dimensions.paddingSizeDefault),
+                    CustomTextFieldWidget(
+                      hintText: getTranslated('last_name', context),
+                      prefixAssetUrl: Images.profile,
+                      isShowBorder: true,
+                      isShowPrefixIcon: true,
+                      controller: _lastNameController,
+                      focusNode: _lastNameFocus,
+                      nextFocus: _numberFocus,
+                      inputType: TextInputType.name,
+                      capitalization: TextCapitalization.words,
+                    ),
+                    const SizedBox(height: Dimensions.paddingSizeDefault),
 
                     // for email section
 
@@ -264,7 +303,16 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     //         height: Dimensions.paddingSizeExtraLarge,
                     //         color: Theme.of(context).dividerColor),
                     //     Expanded(
-                    //         child: ),
+                    //       child: CustomTextFieldWidget(
+                    //         hintText:
+                    //             getTranslated('enter_phone_number', context),
+                    //         isShowBorder: true,
+                    //         controller: _numberController,
+                    //         focusNode: _numberFocus,
+                    //         nextFocus: _emailFocus,
+                    //         inputType: TextInputType.phone,
+                    //       ),
+                    //     ),
                     //   ]),
                     // ),
 
@@ -276,8 +324,14 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       nextFocus: _emailFocus,
                       inputType: TextInputType.phone,
                       countryDialCode: 'US',
-                      onChanged: (countryCode) {
-                        _countryDialCode = countryCode.dialCode;
+                      fillColor: Colors.white,
+                      onCountryChanged: (countryCode) {
+                        setState(() {
+                          _countryDialCode = countryCode.dialCode;
+                          _selectedCountryCode = countryCode.code;
+                          print(
+                              '----(CREATE ACCOUNT SCREEN)---- Country changed to: ${countryCode.code}, Dial code: ${countryCode.dialCode}');
+                        });
                       },
                     ),
 
