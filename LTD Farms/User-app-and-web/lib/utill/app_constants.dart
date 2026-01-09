@@ -10,7 +10,7 @@ class AppConstants {
   static const String baseUrl =
       'https://pro-fixer.demoappprojects.com/living-the-dream-farm-&-ranch-llc';
   //static const String baseUrl = 'https://pro-fixer.demoappprojects.com/boatersLife';
-  // static const String baseUrl = 'https://cbcee230b098.ngrok-free.app/';
+  // static const String baseUrl = 'https://7c88fcf33ee4.ngrok-free.app';
 
   static const String categoryUri = '/api/v1/categories';
   static const String bannerUri = '/api/v1/banners';
